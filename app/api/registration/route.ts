@@ -1,7 +1,10 @@
-import { NextResponse } from "next/server";
 
-// Temporary in-memory storage for registered users
+
+import { NextResponse } from "next/server";
+import { v4 as uuidv4 } from 'uuid';
+import cookie from 'cookie';
 export let registeredUsers: Array<{
+    userID: string;
     username: string;
     firstname: string;
     lastname: string;
@@ -11,7 +14,6 @@ export let registeredUsers: Array<{
     mobilenumber: string;
     registrationDate: string;
 }> = [];
-
 export async function POST(request: Request) {
     try {
         const data = await request.json();
@@ -28,6 +30,8 @@ export async function POST(request: Request) {
             mobilenumber
         } = data;
 
+        console.log("Registered Users:", registeredUsers);
+        
         // Check if user already exists
         const existingUser = registeredUsers.find(user => user.username === username);
         if (existingUser) {
@@ -41,8 +45,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Passwords do not match" }, { status: 400 });
         }
 
+        // Generate unique userID and registration date
+        const userID = uuidv4();
         const registrationDate = new Date().toUTCString();
+
+        // Add new user with userID to the in-memory storage
         registeredUsers.push({
+            userID,
             username,
             firstname,
             lastname,
@@ -56,26 +65,26 @@ export async function POST(request: Request) {
         console.log("Registration successful for:", username);
 
         // Serialize registered users to a JSON string for storing in a cookie
-        const usersCookieValue = JSON.stringify(registeredUsers.map(user => ({
-            username: user.username,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            middlename: user.middlename,
-password: user.password,
-            email: user.email,
-            mobilenumber: user.mobilenumber,
-            registrationDate: user.registrationDate
-        })));
+        const usersCookieValue = JSON.stringify(registeredUsers);
 
+        // Set cookie using NextResponse to ensure compatibility with Next.js
         const response = NextResponse.json({ message: "Registration successful" }, { status: 201 });
-        response.headers.set('Set-Cookie', `registeredUsers=${encodeURIComponent(usersCookieValue)}; Path=/; HttpOnly; Secure; SameSite=Strict`);
+       
+        response.cookies.set("registeredUsers", usersCookieValue, {
+            path: "/",
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict"
+        });
 
+   
         return response;
-    } catch (error) {
-        console.error("Registration failed:", error);
-        return NextResponse.json({ "error": "Registration failed" });
+    } catch (error: Error | any) {
+        console.error("Registration failed:", error.message);
+        return NextResponse.json({ error: "Registration failed" }, { status: 500 });
     }
 }
+
 export async function GET() {
-    return NextResponse.json({ registeredUsers }, { status: 200 });
+    return NextResponse.json(registeredUsers);
 }
