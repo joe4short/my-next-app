@@ -84,7 +84,7 @@ const MyForm: React.FC = () => {
           width={"100%"}
         >
           <Typography variant="h4" component="h1" gutterBottom>
-            Sample Registration Form
+            Registration Form
           </Typography>
           {message && <Typography color="error">{message}</Typography>}
           <Formik
@@ -105,6 +105,7 @@ const MyForm: React.FC = () => {
                     onChange={handleChange}
                     error={touched.username && Boolean(errors.username)}
                     helperText={<ErrorMessage name="username" />}
+                    style={{ margin: '8px 0' }}
                   />
 
                   <Field
@@ -118,6 +119,7 @@ const MyForm: React.FC = () => {
                     onChange={handleChange}
                     error={touched.password && Boolean(errors.password)}
                     helperText={<ErrorMessage name="password" />}
+                    style={{ margin: '8px 0' }}
                   />
 
                   <Field
@@ -131,6 +133,7 @@ const MyForm: React.FC = () => {
                     onChange={handleChange}
                     error={touched.confirmPassword && Boolean(errors.confirmPassword)}
                     helperText={<ErrorMessage name="confirmPassword" />}
+                    style={{ margin: '8px 0' }}
                   />
 
                   <Field
@@ -143,6 +146,7 @@ const MyForm: React.FC = () => {
                     onChange={handleChange}
                     error={touched.firstname && Boolean(errors.firstname)}
                     helperText={<ErrorMessage name="firstname" />}
+                    style={{ margin: '8px 0' }}
                   />
 
                   <Field
@@ -155,6 +159,7 @@ const MyForm: React.FC = () => {
                     onChange={handleChange}
                     error={touched.lastname && Boolean(errors.lastname)}
                     helperText={<ErrorMessage name="lastname" />}
+                    style={{ margin: '8px 0' }}
                   />
 
                   <Field
@@ -164,6 +169,7 @@ const MyForm: React.FC = () => {
                     fullWidth
                     variant="outlined"
                     onChange={handleChange}
+                    style={{ margin: '8px 0' }}
                   />
 
                   <Field
@@ -177,6 +183,7 @@ const MyForm: React.FC = () => {
                     onChange={handleChange}
                     error={touched.email && Boolean(errors.email)}
                     helperText={<ErrorMessage name="email" />}
+                    style={{ margin: '8px 0' }}
                   />
 
                   <Field
@@ -189,6 +196,7 @@ const MyForm: React.FC = () => {
                     onChange={handleChange}
                     error={touched.mobilenumber && Boolean(errors.mobilenumber)}
                     helperText={<ErrorMessage name="mobilenumber" />}
+                    style={{ margin: '8px 0' }}
                   />
 
                   <Button type="submit" variant="contained" color="primary" fullWidth>

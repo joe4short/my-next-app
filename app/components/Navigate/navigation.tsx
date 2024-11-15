@@ -7,7 +7,7 @@ const navigationPage = () => {
       <nav><Link className='text-blue-800' href='/registration'>Registration</Link></nav>
       <nav><Link className='text-blue-800' href='/'>Home</Link></nav>
       <nav><Link className='text-blue-800' href='/contact'>Contact</Link></nav>
-      <nav><Link className='text-blue-800' href='/profile'>Profile</Link></nav>
+      <nav><Link className='text-blue-800' href='/login'>Profile</Link></nav>
     </div>
   )
 }

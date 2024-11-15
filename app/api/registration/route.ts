@@ -1,8 +1,8 @@
 
-
 import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from 'uuid';
 import cookie from 'cookie';
+import { colors } from "@mui/material";
 export let registeredUsers: Array<{
     userID: string;
     username: string;
@@ -62,6 +62,7 @@ export async function POST(request: Request) {
             registrationDate
         });
 
+        console.log("content of registeredUsers:", registeredUsers);
         console.log("Registration successful for:", username);
 
         // Serialize registered users to a JSON string for storing in a cookie
@@ -70,14 +71,18 @@ export async function POST(request: Request) {
         // Set cookie using NextResponse to ensure compatibility with Next.js
         const response = NextResponse.json({ message: "Registration successful" }, { status: 201 });
        
-        response.cookies.set("registeredUsers", usersCookieValue, {
-            path: "/",
-            httpOnly: true,
-            secure: true,
-            sameSite: "strict"
-        });
+        const cookie = response.cookies.get("registeredUsers");
+        if (cookie === undefined || cookie.value !== usersCookieValue) {
+            response.cookies.set("registeredUsers", usersCookieValue, {
+                path: "/",
+                httpOnly: true,
+                secure: true,
+                sameSite: "strict"
+            });
+        }
 
    
+
         return response;
     } catch (error: Error | any) {
         console.error("Registration failed:", error.message);
