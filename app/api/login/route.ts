@@ -13,24 +13,28 @@ export async function POST(request: Request) {
 
 
 
-        console.log("Registered Users from Cookie:", registeredUsers);
-        console.log("Login Request Data:", data);
+        // console.log("Registered Users from Cookie:", registeredUsers);
+        // console.log("Login Request Data:", data);
 
         // Check if user exists with matching username and password
         const existingUser = registeredUsers.find((user: any) => user.username === username && user.password === password);
         
+        const response = NextResponse.json({ message: "Login successful", userID: existingUser.userID });
+        response.headers.set('Set-Cookie', `userID=${existingUser.userID}; Path=/; HttpOnly; Secure; SameSite=Strict`);
+    
+        console.log("Login successful for:", username);
+
+        // Return userID in the response and set it as a cookie for use in the profile page
+  
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        response.headers.set('Location', new URL(`/profile/${existingUser.userID}`, request.url).toString());
+
         if (!existingUser) {
             console.log("Error: Incorrect username or password for username:", username);
             return NextResponse.json({ error: "Incorrect username or password" }, { status: 400 });
         }
-
-        console.log("Login successful for:", username);
-
-        // Return userID in the response and set it as a cookie for use in the profile page
-        const response = NextResponse.json({ message: "Login successful", userID: existingUser.userID });
-        response.headers.set('Set-Cookie', `userID=${existingUser.userID}; Path=/; HttpOnly; Secure; SameSite=Strict`);
-        response.headers.set('Location', new URL(`/profile/${existingUser.userID}`, request.url).toString());
-
+    
         return response;
 
     } catch (error) {

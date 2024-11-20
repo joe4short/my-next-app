@@ -1,3 +1,17 @@
+// import LoginForm from "../components/LoginForm";
+// import React from "react";
+// const LoginPageMain = () => {
+//   const onLogin = (username: string, password: string) => {
+//     console.log(`Logging in with username: ${username} and password: ${password}`);
+//   };
+
+//   return <LoginForm onLogin={onLogin} />;
+ 
+// };
+
+// export default LoginPageMain;
+
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -39,9 +53,13 @@ const LoginPage: React.FC = () => {
   const calculateTimeRemaining = (username: string) => {
     const lockoutEndTime = parseInt(Cookies.get(`lockoutEndTime_${username}`) || "0");
     const currentTime = Date.now();
-    const remaining = lockoutEndTime - currentTime;
-    setTimeRemaining(remaining > 0 ? remaining : null);
-    setIsLocked(remaining > 0);
+    if (lockoutEndTime > currentTime) {
+      setTimeRemaining(lockoutEndTime - currentTime);
+      setIsLocked(true);
+    } else {
+      setIsLocked(false);
+      setTimeRemaining(null);
+    }
   };
 
   useEffect(() => {
@@ -59,30 +77,35 @@ const LoginPage: React.FC = () => {
     const { username } = values;
     calculateTimeRemaining(username);
 
-    if (isLocked) {
-      setMessage(" Please try again to login.");
+    if (isLocked && timeRemaining == null) {
+      setMessage("Account is currently disabled. Please try again later.");
       return;
     }
 
     try {
       const response = await axios.post("/api/login", values);
-
       if (response.status === 200) {
         setMessage("Login successful");
-        router.push(`/profile/${response.data.userID}`);
         setFailedAttempts(username, 0); // Reset failed attempts on success
+        router.push(`/profile/${response.data.userID}`);
       }
     } catch (error: any) {
       const attempts = getFailedAttempts(username) + 1;
       setFailedAttempts(username, attempts);
 
-      if (attempts >= 3) {
-        const lockoutEndTime = Date.now() + 30 * 60 * 1000; // 30 minutes
+      if (attempts >= 4) {
+        const lockoutEndTime = parseInt(Cookies.get(`lockoutEndTime_${username}`) || "0") || Date.now() + 30 * 60 * 1000;
         setLockoutEndTime(username, lockoutEndTime);
         calculateTimeRemaining(username);
+        setIsLocked(true);
+
+        if (!setIsLocked)
+        {
         setMessage("Account disabled for 30 minutes. Please try again later.");
+       }
+
       } else {
-        setMessage(`Login failed. ${3 - attempts} attempts remaining.`);
+         setMessage(`Login failed. ${3 - attempts} attempts remaining.`);
       }
     }
   };
